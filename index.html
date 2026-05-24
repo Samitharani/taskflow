@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — Get Things Done</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen">
+      <div class="auth-bg">
+        <div class="auth-orb orb1"></div>
+        <div class="auth-orb orb2"></div>
+        <div class="auth-orb orb3"></div>
+      </div>
+      <div class="auth-container">
+        <div class="auth-brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="currentColor"/><path d="M8 16l5 5 11-11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="brand-name">TaskFlow</span>
+        </div>
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Sign In</button>
+            <button class="auth-tab" data-tab="register">Create Account</button>
+          </div>
+
+          <!-- Login Form -->
+          <form id="login-form" class="auth-form active">
+            <div class="form-group">
+              <label>Email address</label>
+              <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required />
+            </div>
+            <div id="login-error" class="form-error hidden"></div>
+            <button type="submit" class="btn-primary btn-full">
+              <span class="btn-text">Sign In</span>
+              <span class="btn-loader hidden"></span>
+            </button>
+            <p class="auth-hint">Demo: test@demo.com / password123</p>
+          </form>
+
+          <!-- Register Form -->
+          <form id="register-form" class="auth-form">
+            <div class="form-group">
+              <label>Full name</label>
+              <input type="text" id="reg-name" placeholder="Alex Johnson" autocomplete="name" required />
+            </div>
+            <div class="form-group">
+              <label>Email address</label>
+              <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" required />
+            </div>
+            <div class="form-group">
+              <label>Password <span class="label-hint">(min 6 chars)</span></label>
+              <input type="password" id="reg-password" placeholder="Create a strong password" autocomplete="new-password" required />
+            </div>
+            <div id="register-error" class="form-error hidden"></div>
+            <button type="submit" class="btn-primary btn-full">
+              <span class="btn-text">Create Account</span>
+              <span class="btn-loader hidden"></span>
+            </button>
+          </form>
+        </div>
+        <p class="auth-footer">Task management, beautifully simple.</p>
+      </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="app-screen" class="screen hidden">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="brand-icon small">
+            <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="10" fill="currentColor"/><path d="M8 16l5 5 11-11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="brand-name">TaskFlow</span>
+          <button class="sidebar-close" id="sidebar-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-filter="all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            All Tasks
+            <span class="nav-badge" id="badge-all">0</span>
+          </button>
+          <button class="nav-item" data-filter="todo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>
+            To Do
+            <span class="nav-badge" id="badge-todo">0</span>
+          </button>
+          <button class="nav-item" data-filter="in_progress">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3m6.36 1.64-2.12 2.12M21 12h-3m-1.64 6.36-2.12-2.12M12 21v-3m-6.36-1.64 2.12-2.12M3 12h3m1.64-6.36 2.12 2.12"/></svg>
+            In Progress
+            <span class="nav-badge" id="badge-progress">0</span>
+          </button>
+          <button class="nav-item" data-filter="done">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg>
+            Completed
+            <span class="nav-badge" id="badge-done">0</span>
+          </button>
+          <button class="nav-item" data-filter="urgent">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Urgent
+            <span class="nav-badge urgent" id="badge-urgent">0</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-card" id="user-card">
+            <div class="user-avatar" id="sidebar-avatar"></div>
+            <div class="user-info">
+              <span class="user-name" id="sidebar-name">Loading…</span>
+              <span class="user-email" id="sidebar-email"></span>
+            </div>
+            <button class="user-menu-btn" id="user-menu-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+          </div>
+          <div class="user-dropdown hidden" id="user-dropdown">
+            <button id="profile-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile Settings
+            </button>
+            <button id="logout-btn" class="danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Overlay for mobile -->
+      <div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="topbar">
+          <button class="menu-toggle" id="menu-toggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="topbar-left">
+            <h1 class="page-title" id="page-title">All Tasks</h1>
+            <div class="ws-indicator" id="ws-indicator" title="Real-time sync">
+              <span class="ws-dot"></span>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" id="search-input" placeholder="Search tasks…" />
+              <button class="search-clear hidden" id="search-clear">×</button>
+            </div>
+            <div class="filter-group">
+              <select id="priority-filter">
+                <option value="all">All Priorities</option>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <select id="sort-select">
+                <option value="created_at:desc">Newest First</option>
+                <option value="created_at:asc">Oldest First</option>
+                <option value="due_date:asc">Due Date</option>
+                <option value="priority:desc">Priority</option>
+                <option value="title:asc">A → Z</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="new-task-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              New Task
+            </button>
+          </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar" id="stats-bar">
+          <div class="stat-card">
+            <span class="stat-num" id="stat-total">0</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat-card todo">
+            <span class="stat-num" id="stat-todo">0</span>
+            <span class="stat-label">To Do</span>
+          </div>
+          <div class="stat-card progress">
+            <span class="stat-num" id="stat-progress">0</span>
+            <span class="stat-label">In Progress</span>
+          </div>
+          <div class="stat-card done">
+            <span class="stat-num" id="stat-done">0</span>
+            <span class="stat-label">Done</span>
+          </div>
+          <div class="stat-card urgent">
+            <span class="stat-num" id="stat-urgent">0</span>
+            <span class="stat-label">Urgent</span>
+          </div>
+        </div>
+
+        <!-- View Toggle & Bulk Actions -->
+        <div class="toolbar">
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="list" title="List view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <button class="view-btn" data-view="board" title="Board view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>
+            </button>
+            <button class="view-btn" data-view="grid" title="Grid view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+          </div>
+          <div class="bulk-actions hidden" id="bulk-actions">
+            <span id="selected-count">0 selected</span>
+            <button class="btn-ghost" id="bulk-done-btn">Mark Done</button>
+            <button class="btn-ghost danger" id="bulk-delete-btn">Delete</button>
+            <button class="btn-ghost" id="bulk-clear-btn">Clear</button>
+          </div>
+        </div>
+
+        <!-- Task Area -->
+        <div class="task-area" id="task-area">
+          <div class="loading-state" id="loading-state">
+            <div class="spinner"></div>
+            <span>Loading tasks…</span>
+          </div>
+          <div class="empty-state hidden" id="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 64 64" fill="none"><rect x="8" y="8" width="48" height="48" rx="12" stroke="currentColor" stroke-width="2"/><path d="M22 32h20M22 24h20M22 40h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <h3>No tasks yet</h3>
+            <p>Create your first task to get started!</p>
+            <button class="btn-primary" onclick="document.getElementById('new-task-btn').click()">
+              + New Task
+            </button>
+          </div>
+          <div id="tasks-container"></div>
+          <!-- Board View -->
+          <div id="board-container" class="board-view hidden">
+            <div class="board-column" data-status="todo">
+              <div class="column-header">
+                <span class="column-dot todo"></span>
+                <h3>To Do</h3>
+                <span class="column-count" id="col-count-todo">0</span>
+              </div>
+              <div class="column-tasks" id="col-todo"></div>
+              <button class="col-add-btn" onclick="openTaskModal()">+ Add Task</button>
+            </div>
+            <div class="board-column" data-status="in_progress">
+              <div class="column-header">
+                <span class="column-dot in_progress"></span>
+                <h3>In Progress</h3>
+                <span class="column-count" id="col-count-in_progress">0</span>
+              </div>
+              <div class="column-tasks" id="col-in_progress"></div>
+            </div>
+            <div class="board-column" data-status="done">
+              <div class="column-header">
+                <span class="column-dot done"></span>
+                <h3>Done</h3>
+                <span class="column-count" id="col-count-done">0</span>
+              </div>
+              <div class="column-tasks" id="col-done"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Task Modal -->
+  <div class="modal-overlay hidden" id="task-modal-overlay">
+    <div class="modal" id="task-modal">
+      <div class="modal-header">
+        <h2 id="modal-title">New Task</h2>
+        <button class="modal-close" id="modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="task-form">
+        <input type="hidden" id="task-id" />
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <input type="text" id="task-title" placeholder="What needs to be done?" required maxlength="200" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="task-desc" placeholder="Add details, notes, or context…" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="task-status">
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="task-priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="task-due" />
+        </div>
+        <div class="form-group">
+          <label>Tags <span class="label-hint">(press Enter to add)</span></label>
+          <div class="tags-input" id="tags-input-container">
+            <div class="tags-list" id="tags-list"></div>
+            <input type="text" id="tag-input" placeholder="Add tag…" maxlength="30" />
+          </div>
+        </div>
+        <div id="task-form-error" class="form-error hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="task-submit">
+            <span class="btn-text">Create Task</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal-overlay hidden" id="profile-modal-overlay">
+    <div class="modal" id="profile-modal">
+      <div class="modal-header">
+        <h2>Profile Settings</h2>
+        <button class="modal-close" id="profile-modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="profile-form">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar" id="profile-avatar-display"></div>
+          <div>
+            <h3 id="profile-name-display">Name</h3>
+            <p id="profile-email-display">email</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="profile-name" placeholder="Your name" />
+        </div>
+        <hr class="divider" />
+        <p class="section-label">Change Password</p>
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" id="current-password" placeholder="Enter current password" autocomplete="current-password" />
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="new-password" placeholder="Enter new password" autocomplete="new-password" />
+        </div>
+        <div id="profile-error" class="form-error hidden"></div>
+        <div id="profile-success" class="form-success hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="profile-cancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay hidden" id="confirm-modal-overlay">
+    <div class="modal small" id="confirm-modal">
+      <div class="modal-header">
+        <h2>Delete Task</h2>
+      </div>
+      <p class="confirm-text">Are you sure you want to delete this task? This cannot be undone.</p>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="confirm-cancel">Cancel</button>
+        <button class="btn-danger" id="confirm-delete">Delete Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
